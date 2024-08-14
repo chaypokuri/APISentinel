@@ -48,7 +48,8 @@ variable "sku_name" {
     condition     = contains(["Developer", "Standard", "Premium"], var.sku_name)
     error_message = "The sku must be one of the following: Developer, Standard, Premium."
   }
-  }
+}
+
 variable "api_name" {
   description = "The name of the API."
   type        = string
