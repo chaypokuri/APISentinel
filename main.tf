@@ -1,12 +1,12 @@
 provider "azurerm" {
-  features  {}
+  features {}
 subscription_id = "c2bd123a-183f-43d5-bf41-c725494e595a"
 tenant_id = "3180c264-31bc-4113-8f50-b7393a40457b"
 client_id = "1a046c02-8c39-4f1d-b30b-93f41a9c6b15"
 client_secret = "kUz8Q~qwom0J-MM5ZNqexXyUOguygMj5QELdhdl5"
 }
 
-# Input Variables
+# Variables
 variable "resource_group_name" {
   description = "The name of the resource group in which to create the API Management instance."
   type        = string
@@ -71,6 +71,11 @@ variable "content_value" {
   description = "The URL of the API definition."
   type        = string
 }
+variable "sentinel_workspace_id" {
+  description = "The ID of the Azure Sentinel (Log Analytics Workspace)."
+  type        = string
+}
+
 # Resource Group
 resource "azurerm_resource_group" "api_rg" {
   name     = var.resource_group_name
@@ -104,6 +109,65 @@ resource "azurerm_api_management_api" "api" {
   import {
     content_format = var.content_format
     content_value  = var.content_value
+  }
+}
+
+# Azure Policy Definition for Sentinel
+resource "azurerm_policy_definition" "apim_identity_policy" {
+  name         = "apim-system-assigned-identity"
+  policy_type  = "Custom"
+  mode         = "All"
+  display_name = "Ensure API Management has System-Assigned Managed Identity"
+  description  = "Audit API Management instances that do not have a System-Assigned Managed Identity enabled."
+
+  policy_rule = <<POLICY
+{
+  "if": {
+    "allOf": [
+      {
+        "field": "type",
+        "equals": "Microsoft.ApiManagement/service"
+      },
+      {
+        "field": "identity.type",
+        "notEquals": "SystemAssigned"
+      }
+    ]
+  },
+  "then": {
+    "effect": "audit"
+  }
+}
+POLICY
+
+  metadata = <<METADATA
+{
+  "category": "API Management"
+}
+METADATA
+}
+
+# Policy Assignment
+resource "azurerm_policy_assignment" "apim_identity_assignment" {
+  name                 = "apim-system-assigned-identity-assignment"
+  policy_definition_id = azurerm_policy_definition.apim_identity_policy.id
+  scope                = azurerm_resource_group.api_rg.id
+}
+
+# Diagnostic Setting for API Management
+resource "azurerm_monitor_diagnostic_setting" "sentinel_policy_diagnostics" {
+  name                       = "apim-policy-diagnostics"
+  target_resource_id         = azurerm_api_management.api_mgmt.id
+  log_analytics_workspace_id = var.sentinel_workspace_id
+
+  log {
+    category = "PolicyInsights"
+    enabled  = true
+
+    retention_policy {
+      enabled = true
+      days    = 30
+    }
   }
 }
 
