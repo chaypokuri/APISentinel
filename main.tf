@@ -89,8 +89,6 @@ resource "azurerm_api_management" "api_mgmt" {
   identity {
     type = "SystemAssigned"
   }
-
-  tags = var.tags
 }
 
 # API Definition
