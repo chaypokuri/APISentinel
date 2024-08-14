@@ -71,12 +71,6 @@ variable "content_value" {
   description = "The URL of the API definition."
   type        = string
 }
-
-variable "tags" {
-  description = "Tags to apply to the resources."
-  type        = map(string)
-}
-
 # Resource Group
 resource "azurerm_resource_group" "api_rg" {
   name     = var.resource_group_name
@@ -113,8 +107,6 @@ resource "azurerm_api_management_api" "api" {
     content_format = var.content_format
     content_value  = var.content_value
   }
-
-  tags = var.tags
 }
 
 # Outputs
