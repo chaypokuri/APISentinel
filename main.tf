@@ -1,16 +1,12 @@
 provider "azurerm" {
   features {}
-subscription_id = "c2bd123a-183f-43d5-bf41-c725494e595a"
-tenant_id = "3180c264-31bc-4113-8f50-b7393a40457b"
-client_id = "1a046c02-8c39-4f1d-b30b-93f41a9c6b15"
-client_secret = "kUz8Q~qwom0J-MM5ZNqexXyUOguygMj5QELdhdl5"
 }
 
 terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 3.59.0"
     }
   }
 }
@@ -21,75 +17,7 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "location" {
-  description = "The Azure region where the API Management instance should be created."
-  type        = string
-}
-
-variable "api_management_name" {
-  description = "The name of the API Management instance."
-  type        = string
-}
-
-variable "publisher_name" {
-  description = "The name of the publisher."
-  type        = string
-}
-
-variable "publisher_email" {
-  description = "The email of the publisher."
-  type        = string
-}
-
-variable "sku_name" {
-  description = "The SKU name of the API Management instance."
-  type        = string
-}
-
-variable "api_name" {
-  description = "The name of the API."
-  type        = string
-}
-
-variable "api_revision" {
-  description = "The revision of the API."
-  type        = string
-}
-
-variable "api_display_name" {
-  description = "The display name of the API."
-  type        = string
-}
-
-variable "api_path" {
-  description = "The path of the API."
-  type        = string
-}
-
-variable "api_protocols" {
-  description = "The protocols supported by the API."
-  type        = list(string)
-}
-
-variable "content_format" {
-  description = "The format of the API definition. (swagger-link-json, swagger-link, wsdl-link, openapi-link)"
-  type        = string
-}
-
-variable "content_value" {
-  description = "The URL of the API definition."
-  type        = string
-}
-
-variable "tags" {
-  description = "Tags to apply to the API Management instance."
-  type        = map(string)
-}
-
-variable "sentinel_workspace_id" {
-  description = "The ID of the Azure Sentinel (Log Analytics Workspace)."
-  type        = string
-}
+# Other variables here...
 
 # Resource Group
 resource "azurerm_resource_group" "api_rg" {
@@ -127,48 +55,6 @@ resource "azurerm_api_management_api" "api" {
     content_format = var.content_format
     content_value  = var.content_value
   }
-}
-
-# Azure Policy Definition for Sentinel
-resource "azurerm_policy_definition" "apim_identity_policy" {
-  name         = "apim-system-assigned-identity"
-  policy_type  = "Custom"
-  mode         = "All"
-  display_name = "Ensure API Management has System-Assigned Managed Identity"
-  description  = "Audit API Management instances that do not have a System-Assigned Managed Identity enabled."
-
-  policy_rule = <<POLICY
-{
-  "if": {
-    "allOf": [
-      {
-        "field": "type",
-        "equals": "Microsoft.ApiManagement/service"
-      },
-      {
-        "field": "identity.type",
-        "notEquals": "SystemAssigned"
-      }
-    ]
-  },
-  "then": {
-    "effect": "audit"
-  }
-}
-POLICY
-
-  metadata = <<METADATA
-{
-  "category": "API Management"
-}
-METADATA
-}
-
-# Policy Assignment
-resource "azurerm_policy_assignment" "apim_identity_assignment" {
-  name                 = "apim-system-assigned-identity-assignment"
-  policy_definition_id = azurerm_policy_definition.apim_identity_policy.id
-  scope                = azurerm_resource_group.api_rg.id
 }
 
 # Diagnostic Setting for API Management
