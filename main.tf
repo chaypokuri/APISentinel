@@ -1,3 +1,11 @@
+provider "azurerm" {
+  features {}
+subscription_id = "c2bd123a-183f-43d5-bf41-c725494e595a"
+tenant_id = "3180c264-31bc-4113-8f50-b7393a40457b"
+client_id = "1a046c02-8c39-4f1d-b30b-93f41a9c6b15"
+client_secret = "kUz8Q~qwom0J-MM5ZNqexXyUOguygMj5QELdhdl5"
+}
+
 terraform {
   required_providers {
     azurerm = {
@@ -5,14 +13,6 @@ terraform {
       version = "~> 3.0"
     }
   }
-}
-
-provider "azurerm" {
-  features {}
-subscription_id = "c2bd123a-183f-43d5-bf41-c725494e595a"
-tenant_id = "3180c264-31bc-4113-8f50-b7393a40457b"
-client_id = "1a046c02-8c39-4f1d-b30b-93f41a9c6b15"
-client_secret = "kUz8Q~qwom0J-MM5ZNqexXyUOguygMj5QELdhdl5"
 }
 
 # Variables
@@ -80,6 +80,12 @@ variable "content_value" {
   description = "The URL of the API definition."
   type        = string
 }
+
+variable "tags" {
+  description = "Tags to apply to the API Management instance."
+  type        = map(string)
+}
+
 variable "sentinel_workspace_id" {
   description = "The ID of the Azure Sentinel (Log Analytics Workspace)."
   type        = string
@@ -103,6 +109,8 @@ resource "azurerm_api_management" "api_mgmt" {
   identity {
     type = "SystemAssigned"
   }
+
+  tags = var.tags
 }
 
 # API Definition
