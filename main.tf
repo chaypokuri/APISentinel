@@ -101,8 +101,7 @@ resource "azurerm_api_management" "api_mgmt" {
   resource_group_name = azurerm_resource_group.api_rg.name
   publisher_name      = var.publisher_name
   publisher_email     = var.publisher_email
-  sku_name            = var.sku_name
-
+  sku_name            = "${var.sku}
   identity {
     type = "SystemAssigned"
   }
