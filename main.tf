@@ -48,6 +48,7 @@ variable "sku_name" {
   validation {
     condition     = var.sku_name in ["Developer", "Basic", "Standard", "Premium"]
     error_message = "The sku_name must be one of: Developer, Basic, Standard, Premium."
+
   }
 }
 
