@@ -138,14 +138,6 @@ POLICY
 }
 METADATA
 }
-
-# Policy Assignment
-data "azurerm_policy_assignment" "apim_identity_assignment" {
-  name                 = "apim-system-assigned-identity-assignment"
-  policy_definition_id = azurerm_policy_definition.apim_identity_policy.id
-  scope                = azurerm_resource_group.api_rg.id
-}
-
 # Diagnostic Setting for API Management
 data "azurerm_monitor_diagnostic_setting" "sentinel_policy_diagnostics" {
   name                       = "apim-policy-diagnostics"
