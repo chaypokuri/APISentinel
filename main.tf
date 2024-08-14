@@ -139,7 +139,7 @@ POLICY
 METADATA
 }
 # Diagnostic Setting for API Management
-data "azurerm_monitor_diagnostic_setting" "sentinel_policy_diagnostics" {
+resource "azurerm_monitor_diagnostic_setting" "sentinel_policy_diagnostics" {
   name                       = "apim-policy-diagnostics"
   target_resource_id         = azurerm_api_management.api_mgmt.id
   log_analytics_workspace_id = var.sentinel_workspace_id
