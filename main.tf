@@ -44,6 +44,7 @@ variable "publisher_email" {
 variable "sku_name" {
   description = "The SKU name of the API Management instance."
   type        = string
+  default     = "Developer"
   validation {
     condition     = contains(["Developer", "Standard", "Premium"], var.sku_name)
     error_message = "The sku must be one of the following: Developer, Standard, Premium."
